@@ -30,7 +30,7 @@ export default async function handler(req: any, res: any) {
       searchableArray.push(value);
     }
 
-    const searcher = new FuzzySearch(searchableArray, ['title', 'menuText', 'path']);
+    const searcher = new FuzzySearch(searchableArray as any, ['title', 'menuText', 'path']);
 
     const searchResults = searcher.search(query);
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react"
-import { contentItemMethods, useAgilityAppSDK, setHeight } from "@agility/app-sdk"
+import { contentItemMethods, useAgilityAppSDK, setHeight, getManagementAPIToken } from "@agility/app-sdk"
 import useOnScreen from "../hooks/useOnScreen"
 
 import EditorJS from '@editorjs/editorjs'
@@ -17,30 +17,37 @@ import Delimiter from '@editorjs/delimiter'
 import InlineCode from '@editorjs/inline-code'
 import NestedList from '@editorjs/nested-list'
 import DragDrop from 'editorjs-drag-drop'
-//import Undo from 'editorjs-undo' //this has bugs...
-//import LinkAutocomplete from '@editorjs/link-autocomplete' //enable this to support link autocompletes (requires env-vars)
 
 const BlockEditor = ({ configuration }: { configuration: any }) => {
     const { field, instance, contentItem } = useAgilityAppSDK()
-    const containerRef = useRef<HTMLIFrameElement>()
-    const blockRef = useRef<HTMLIFrameElement>()
+    const containerRef = useRef<HTMLIFrameElement>(null)
+    const blockRef = useRef<HTMLIFrameElement>(null)
     const [editor, setEditor] = useState({})
     const isVisible = useOnScreen(containerRef)
     const blockValues = useMemo(() => contentItem?.values?.BlockEditorApp, [contentItem?.values?.BlockEditorApp])	
+		const [token, setToken] = useState()
+
+		// Get the ManagementAPIToken
+		useEffect(() => {
+			(async () => {
+				const token = await getManagementAPIToken()
+				setToken(token)
+			})()
+		}, [])
 
 		useEffect(() => {
-			if (!isVisible || !field) return
+			if (!isVisible || !field || !token || !blockRef.current) return
 
 			//if running locally after a hot-module replacement, don't reinitialize everything...
 			if (editor && Object.keys(editor).length > 0) return;
 
 			const uploadImagePayload = {
-					websiteName: instance?.websiteName,
-					securityKey: configuration.securityKey,
-					location: configuration.dcLocation,
-					assetFolder: configuration.assetFolder ? configuration.assetFolder : ''
+				guid: instance?.guid,
+				token,
+				assetFolder: configuration.assetFolder ? configuration.assetFolder : '/'
 			};
 
+			console.log(uploadImagePayload)
 			const valueJS = typeof blockValues === 'string' ? JSON.parse(blockValues) : null;
 
 			const editorJS = new EditorJS({
@@ -63,8 +70,8 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 							class: Image,
 							config: {
 									endpoints: {
-											byFile: '/api/image/uploadByFile',
-											byUrl: '/api/image/fetchByUrl'
+										byFile: '/api/image/uploadByFile',
+										byUrl: '/api/image/fetchByUrl'
 									},
 									additionalRequestData: { ...uploadImagePayload }
 							}
@@ -90,7 +97,7 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 						const observer = new ResizeObserver((entries) => {
 							const entry = entries[0]
 							if (!entry) return
-							setHeight({ height: entry.contentRect.height + 30 })
+							setHeight({ height: entry.contentRect.height + 50 })
 						})
 						observer.observe(blockSizeElm)
 					}
@@ -105,11 +112,11 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 
 			setEditor(editorJS);
 
-    }, [isVisible, field, editor])
+    }, [isVisible, field, editor, token])
 
     return (
-			<div className="bg-white" ref={containerRef}>
-				<div ref={blockRef} className="border-[0.1px] border-radius rounded border-solid border-gray-300 px-1 py-2 mb-1 "></div>
+			<div className="bg-white py-2" ref={containerRef}>
+				<div ref={blockRef}></div>
 			</div>
     );
 

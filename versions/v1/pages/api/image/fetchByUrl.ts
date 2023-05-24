@@ -1,50 +1,48 @@
-import agilityMgmt from '@agility/content-management'
-import { getNewFileName } from '../../../utils/imageUtils';
 import axios from 'axios'
+import type { NextApiRequest, NextApiResponse } from "next";
+import { getNewFileName } from '../../../utils/imageUtils';
+import * as index from "@agility/management-sdk"
+import nextConnect from 'next-connect';
+import FormData from 'form-data'
 
-export default async function handler(req: any, res: any) {
-  // Process a POST request
-  if (req.method === 'POST') {
+const handler = nextConnect();
+
+handler.post(async (req: NextApiRequest, res: NextApiResponse) => {
+  const token = req.body.token
+  const assetFolder = req.body.assetFolder
+  const guid = req.body.guid
+  const url = req.body.url
+
+  const options = new index.Options()
+  options.token = token
+  
+  const client = new index.ApiClient(options)
+  
+  //download the image from Url
+  const imageReq = await axios.get(url, { responseType: 'stream' });
+  const fileContent = imageReq.data;
+  
+  //build a unique filename with timestamp
+  let fileName = url.substring(url.lastIndexOf('/')+1);
+  fileName = getNewFileName(fileName);
+  
+  const form = new FormData(); 
+  form.append('files',fileContent, fileName);
     
-    //set up Agility CMS Management client
-    // TD: Fix this up to use the new mgmt api
-    const api = agilityMgmt.getApi({
-        location: req.body.location,
-        websiteName: req.body.websiteName,
-        securityKey: req.body.securityKey
+  try {
+    const uploadAsset = await client.assetMethods.upload(form as any, assetFolder, guid)
+    console.log(`Image upload Response`, uploadAsset);
+    return res.status(200).json({ 
+      success: 1,
+      file: {
+        url: uploadAsset[0].edgeUrl,
+      }
     });
-
-    //download the image from Url
-    const imageReq = await axios.get(req.body.url, { responseType: 'stream'});
-    const fileContent = imageReq.data;
-    
-
-    //build a unique filename with timestamp
-    let fileName = req.body.url.substring(req.body.url.lastIndexOf('/')+1);
-    fileName = getNewFileName(fileName);
-
-    //upload the file to Agility CMS
-    const uploadRes = await api.uploadMedia({
-      fileName,
-      fileContent,
-      mediaFolder: req.body?.assetFolder
-    });
-    
-    console.log(`Image upload Response`, uploadRes);
-
-    //return the uploaded file details
-    res.status(200).json({ 
-        success: 1,
-        file: {
-            url: uploadRes.url
-        }
-    });
-    
-  } else {
-    // Handle any other HTTP method
-    res.status(500).json({ 
-      success: 0,
-      message: 'GET request not supported.'
-    });
+  
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({ error: err })
   }
-}
+})
+
+export default handler
