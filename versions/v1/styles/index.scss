@@ -1,0 +1,25 @@
+*,
+:after,
+:before {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+.ce-block__content, 
+.ce-toolbar__content { 
+  max-width: 100% !important; 
+} 
+
+.cdx-block { 
+  max-width: 100% !important; 
+}
+
+.codex-editor__redactor {
+  padding-bottom: 0 !important;
+}

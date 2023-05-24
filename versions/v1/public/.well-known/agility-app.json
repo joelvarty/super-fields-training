@@ -1,0 +1,33 @@
+{
+	"name": "Power Fields",
+	"documentationLink": "https://github.com/agility/agility-cms-app-power-fields",
+	"description": "V2 Power Fields App - containing multiple different custom fields. Markdown Editor, Block Editor and Friendly Slug Generator",
+	"__sdkVersion": "2.0.0",
+	"configValues": [
+		{ 
+			"name": "securityKey", 
+			"label": "Agility CMS Security Key", 
+			"type": "string",
+			"description": "Config value needed for the block editor"
+		},
+		{ 
+			"name": "dcLocation", 
+			"label": "Data Center Location ('USA',  'Canada', 'Europe')", 
+			"type": "string",
+			"description": "Config value needed for the block editor"
+		},        
+		{ 
+			"name": "assetFolder", 
+			"label": "Asset Upload Folder Path (i.e. 'images/block-editor')", 
+			"type": "string",
+			"description": "Config value needed for the block editor"
+		}
+	],
+	"capabilities": {
+		"fields": [
+			{
+				"description": "Field value type representing one of the three custom field types within the powerfield app"
+			}
+		]
+	}
+}
