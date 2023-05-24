@@ -5,18 +5,6 @@
 	"__sdkVersion": "2.0.0",
 	"configValues": [
 		{ 
-			"name": "securityKey", 
-			"label": "Agility CMS Security Key", 
-			"type": "string",
-			"description": "Config value needed for the block editor"
-		},
-		{ 
-			"name": "dcLocation", 
-			"label": "Data Center Location ('USA',  'Canada', 'Europe')", 
-			"type": "string",
-			"description": "Config value needed for the block editor"
-		},        
-		{ 
 			"name": "assetFolder", 
 			"label": "Asset Upload Folder Path (i.e. 'images/block-editor')", 
 			"type": "string",
