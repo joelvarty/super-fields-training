@@ -24,9 +24,9 @@
 				"description": "A markdown editor."
 			},
 			{
-				"label": "Markdown Editor",
-				"name": "MarkdownEditor",
-				"description": "A markdown editor."
+				"label": "Friendly URL",
+				"name": "FriendlyURL",
+				"description": "A slug field for friendly URLs."
 			}
 		]
 	}
