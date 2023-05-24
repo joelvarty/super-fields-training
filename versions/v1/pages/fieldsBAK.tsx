@@ -15,7 +15,7 @@ const MarkdownEditor = dynamic(
 
 export default function App() {
   const { initializing, field, appInstallContext } = useAgilityAppSDK()
-  
+
   const RenderEditor = () => {
     switch(field?.typeName) {
       case "BlockEditor":
@@ -30,7 +30,7 @@ export default function App() {
   }
 
   return (
-    initializing && !field ? 
+    initializing && !field ?
     <span className="m-2 text-sm">Initializing app...</span> :
     RenderEditor()
   )

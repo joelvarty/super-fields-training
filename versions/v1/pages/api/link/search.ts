@@ -1,4 +1,5 @@
-import agility from '@agility/content-fetch'
+const agility = require('@agility/content-fetch')
+
 import FuzzySearch from 'fuzzy-search'
 
 export default async function handler(req: any, res: any) {
@@ -7,7 +8,7 @@ export default async function handler(req: any, res: any) {
 
   // Process a GET request
   if (req.method === 'GET') {
-    
+
     //create the Agility CMS content fetch client
     const api = agility.getApi({
         guid: '7f113aa6-u', //TODO: get these from env-vars
@@ -44,14 +45,14 @@ export default async function handler(req: any, res: any) {
 
 
     //return the uploaded file details
-    res.status(200).json({ 
+    res.status(200).json({
         success: true,
         items: results
     });
-    
+
   } else {
     // Handle any other HTTP method
-    res.status(500).json({ 
+    res.status(500).json({
       success: 0,
       message: 'Request method not supported.'
     });

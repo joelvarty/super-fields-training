@@ -4,9 +4,9 @@
 	"description": "V2 Power Fields App - containing multiple different custom fields. Markdown Editor, Block Editor and Friendly Slug Generator",
 	"__sdkVersion": "2.0.0",
 	"configValues": [
-		{ 
-			"name": "assetFolder", 
-			"label": "Asset Upload Folder Path (i.e. 'images/block-editor')", 
+		{
+			"name": "assetFolder",
+			"label": "Asset Upload Folder Path (i.e. 'images/block-editor')",
 			"type": "string",
 			"description": "Config value needed for the block editor"
 		}
@@ -14,7 +14,19 @@
 	"capabilities": {
 		"fields": [
 			{
-				"description": "Field value type representing one of the three custom field types within the powerfield app"
+				"label": "Block Editor",
+      		"name": "BlockEditor",
+				"description": "A block editor that can replace the rich text editor field."
+			},
+			{
+				"label": "Markdown Editor",
+				"name": "MarkdownEditor",
+				"description": "A markdown editor."
+			},
+			{
+				"label": "Markdown Editor",
+				"name": "MarkdownEditor",
+				"description": "A markdown editor."
 			}
 		]
 	}
