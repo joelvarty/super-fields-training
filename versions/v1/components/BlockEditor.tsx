@@ -51,7 +51,6 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 			assetFolder: configuration.assetFolder ? configuration.assetFolder : "/"
 		}
 
-		console.log(uploadImagePayload)
 		const valueJS = typeof blockValues === "string" ? JSON.parse(blockValues) : null
 
 		const editorJS = new EditorJS({
@@ -100,7 +99,7 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 					const observer = new ResizeObserver((entries) => {
 						const entry = entries[0]
 						if (!entry) return
-						let height = entry.contentRect.height
+						let height = entry.contentRect.height + 50
 						if (height < 400) height = 400
 
 						setHeight({ height})
@@ -120,8 +119,8 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 	}, [isVisible, field, editor, token])
 
 	return (
-		<div className="bg-white p-3" ref={containerRef} id="container-element">
-			<div className="min-h-[200px] prose" ref={blockRef}></div>
+		<div className="bg-white py-2 px-20" ref={containerRef} id="container-element">
+			<div className="min-h-[400px] prose" ref={blockRef}></div>
 		</div>
 	)
 }
