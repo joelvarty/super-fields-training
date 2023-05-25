@@ -15,7 +15,7 @@
 		"fields": [
 			{
 				"label": "Block Editor",
-      		"name": "BlockEditor",
+      		"name": "BlockEditorJSON",
 				"description": "A block editor that can replace the rich text editor field."
 			},
 			{
