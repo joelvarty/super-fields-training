@@ -7,8 +7,8 @@ const BlockEditor = dynamic(() => import("../../components/BlockEditor"), { ssr:
 
 export default function BlockEditorPage() {
 
-	const { initializing, field, appInstallContext } = useAgilityAppSDK()
-	if (initializing) return <span className="m-2 text-sm">Initializing app...</span>
+	const { initializing, appInstallContext } = useAgilityAppSDK()
+	if (initializing) return null
 	return <BlockEditor configuration={appInstallContext?.configuration} />
 
 }
