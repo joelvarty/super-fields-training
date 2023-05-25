@@ -35,13 +35,14 @@ const MarkdownEditor = () => {
 	// when the markdown height of the simple-mde changes, then adjust the height of iframe
 	// and offset the height by 200 so the element can scroll all the way back up
 	useEffect(() => {
-		// min height for the editor is 500
-		const height = markdownHeight < 500 ? 500 : markdownHeight + 200
+		// min height for the editor is 400
+		const height = markdownHeight < 400 ? 400 : markdownHeight + 100
+
 		setHeight({ height })
 	}, [markdownHeight])
 
 	return (
-		<div ref={containerRef} className=" bg-white">
+		<div ref={containerRef} className="bg-white min-h-[400px]">
 			<SimpleMDE id="simple-mde" value={markdownValues} onChange={onChange} />
 		</div>
 	)
