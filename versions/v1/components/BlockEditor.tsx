@@ -48,7 +48,7 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 		const uploadImagePayload = {
 			guid: instance?.guid,
 			token,
-			assetFolder: configuration.assetFolder ? configuration.assetFolder : "/"
+			assetFolder: configuration.assetFolder ?? "/images/block-editor"
 		}
 
 		const valueJS = typeof blockValues === "string" ? JSON.parse(blockValues) : null

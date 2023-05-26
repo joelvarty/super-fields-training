@@ -3,7 +3,7 @@
 	"documentationLink": "https://github.com/agility/agility-cms-app-power-fields",
 	"description": "V2 Power Fields App - containing multiple different custom fields. Markdown Editor, Block Editor and Friendly Slug Generator",
 	"__sdkVersion": "2.0.0",
-	"configValues": [
+	"configValuesBAK": [
 		{
 			"name": "assetFolder",
 			"label": "Asset Upload Folder Path (i.e. 'images/block-editor')",
