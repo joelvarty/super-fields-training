@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@agility/app-sdk@^2.0.0-rc12":
-  version "2.0.0-rc12"
-  resolved "https://registry.yarnpkg.com/@agility/app-sdk/-/app-sdk-2.0.0-rc12.tgz#0330261564d829259bbf68e66c63315271b8be56"
-  integrity sha512-odlovVh3n1KnivqpQOZl3nFtA/4Y8FFBKpZ08vG7u7+vAs+x9iyP3Yr8EZbQLg3gBcM+6HVvX3kU4ZcTonJbBw==
+"@agility/app-sdk@^2.0.0-rc20":
+  version "2.0.0-rc20"
+  resolved "https://registry.yarnpkg.com/@agility/app-sdk/-/app-sdk-2.0.0-rc20.tgz#2d479ed39f04402b39c523f358b53abd7ddfe011"
+  integrity sha512-E2097S9Q1bDeAbfGzHXXu/bCaQEs7zreBkOAgCeoB3butNdnnKrcqC/J7yYnTsVmbG9y2Dkpdzu71zUkgZD26A==
 
 "@agility/content-fetch@^1.1.5":
   version "1.1.5"
@@ -456,6 +456,11 @@
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@heroicons/react/-/react-1.0.6.tgz#35dd26987228b39ef2316db3b1245c42eb19e324"
   integrity sha512-JJCXydOFWMDpCP4q13iEplA503MQO3xLoZiKum+955ZCtHINWnx26CUxVxxFQu/uLb4LW3ge15ZpzIkXKkJ8oQ==
+
+"@heroicons/react@^2.0.18":
+  version "2.0.18"
+  resolved "https://registry.yarnpkg.com/@heroicons/react/-/react-2.0.18.tgz#f80301907c243df03c7e9fd76c0286e95361f7c1"
+  integrity sha512-7TyMjRrZZMBPa+/5Y8lN0iyvUU/01PeMGX2+RE7cQWpEUIcb4QotzUObFkJDejj/HUH4qjP/eQ0gzzKs2f+6Yw==
 
 "@humanwhocodes/config-array@^0.11.8":
   version "0.11.8"

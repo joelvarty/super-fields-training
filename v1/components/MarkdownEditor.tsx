@@ -41,6 +41,7 @@ const MarkdownEditor = () => {
 		setHeight({ height })
 	}, [markdownHeight])
 
+
 	return (
 		<div ref={containerRef} className="bg-white min-h-[400px]">
 			<SimpleMDE id="simple-mde" value={markdownValues} onChange={onChange} />
