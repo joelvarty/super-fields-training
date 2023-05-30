@@ -19,17 +19,16 @@ import NestedList from "@editorjs/nested-list"
 import DragDrop from "editorjs-drag-drop"
 
 const BlockEditor = ({ configuration }: { configuration: any }) => {
-	const { field, instance, contentItem } = useAgilityAppSDK()
+	const {  initializing, field, instance, contentItem, fieldValue } = useAgilityAppSDK()
 	const containerRef = useRef<HTMLIFrameElement>(null)
 	const blockRef = useRef<HTMLIFrameElement>(null)
-	const [editor, setEditor] = useState({})
+	const savedValue = useRef<string | null>(null)
+
 	const isVisible = useOnScreen(containerRef)
-	const blockValues = useMemo(() => {
-		if (!contentItem?.values || !field) return ""
-		const str = contentItem?.values[field.name] || ""
-		return str
-	}, [contentItem?.values, field])
+
 	const [token, setToken] = useState()
+
+	const editor = useRef<EditorJS | null>(null)
 
 	// Get the ManagementAPIToken
 	useEffect(() => {
@@ -40,10 +39,42 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 	}, [])
 
 	useEffect(() => {
-		if (!isVisible || !field || !token || !blockRef.current) return
 
-		//if running locally after a hot-module replacement, don't reinitialize everything...
-		if (editor && Object.keys(editor).length > 0) return
+		//handle changes to the field value from outside the editor
+
+		if (!editor.current) return
+		if (savedValue.current === null) return
+
+		const str = savedValue.current
+
+
+		if (fieldValue !== savedValue.current) {
+
+			if (!fieldValue) {
+				editor.current.clear()
+			} else {
+				const blocks = JSON.parse(fieldValue)
+				if (blocks) {
+					editor.current.render(blocks)
+				}
+			}
+		}
+	}, [fieldValue, editor])
+
+	const initEditor = () => {
+		if (fieldValue && editor.current) {
+			const blocks = JSON.parse(fieldValue)
+			if (blocks) {
+				editor.current.render(blocks)
+			}
+		}
+	}
+
+
+	useEffect(() => {
+		if (!blockRef.current || !token || initializing) return
+
+		if (editor.current) return
 
 		const uploadImagePayload = {
 			guid: instance?.guid,
@@ -51,12 +82,11 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 			assetFolder: configuration.assetFolder ?? "/images/block-editor"
 		}
 
-		const valueJS = typeof blockValues === "string" ? JSON.parse(blockValues) : null
-
 		const editorJS = new EditorJS({
 			autofocus: false, //setting this to true will not do anything because this is in an iframe
 			holder: blockRef.current,
 			placeholder: "📝 Enter text, paste images/embed urls, or select a block to add here...",
+
 			tools: {
 				table: Table,
 				paragraph: {
@@ -90,10 +120,14 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 			onChange: (e: any) => {
 				editorJS.save().then((v: any) => {
 					const valueJSON = JSON.stringify(v)
-					contentItemMethods.setFieldValue({ value: valueJSON })
+					if (valueJSON !== fieldValue) {
+						savedValue.current = valueJSON
+						contentItemMethods.setFieldValue({ value: valueJSON })
+					}
 				})
 			},
 			onReady: () => {
+
 				const blockSizeElm = document.querySelector<HTMLElement>("#container-element")
 				if (blockSizeElm) {
 					const observer = new ResizeObserver((entries) => {
@@ -102,25 +136,23 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 						let height = entry.contentRect.height + 50
 						if (height < 400) height = 400
 
-						setHeight({ height})
+						setHeight({ height })
 					})
 					observer.observe(blockSizeElm)
 				}
 
 				new DragDrop(editorJS)
 
-				if (valueJS && valueJS.blocks && valueJS.blocks.length > 0) {
-					editorJS.render(valueJS)
-				}
+				initEditor()
 			}
 		})
 
-		setEditor(editorJS)
-	}, [isVisible, field, editor, token])
+		editor.current = editorJS
+	}, [blockRef, initializing, token])
 
 	return (
 		<div className="bg-white py-2 px-20" ref={containerRef} id="container-element">
-			<div className="min-h-[400px] prose" ref={blockRef}></div>
+			<div className="min-h-[400px] prose" id="editor-elem" ref={blockRef}></div>
 		</div>
 	)
 }

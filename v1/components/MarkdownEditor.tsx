@@ -4,14 +4,12 @@ import useOnScreen from "../hooks/useOnScreen"
 import SimpleMDE from "react-simplemde-editor"
 
 const MarkdownEditor = () => {
-	const { contentItem, field } = useAgilityAppSDK()
+	const { fieldValue } = useAgilityAppSDK()
 	const containerRef = useRef<HTMLIFrameElement | null>(null)
 	const isVisible = useOnScreen(containerRef)
-	const markdownValues = useMemo(() => {
-		if (!contentItem?.values || !field) return ""
-		const str = contentItem?.values[field.name] || ""
-		return str
-	}, [contentItem?.values, field])
+
+	const markdownValues = fieldValue
+
 	const [markdownHeight, setMarkdownHeight] = useState(500)
 
 	const onChange = (value: string) => {

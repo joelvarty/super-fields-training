@@ -28,31 +28,32 @@ const makeFriendlyStr = (s: string): string => {
 }
 
 const FriendlyURLField = () => {
-	const { contentItem } = useAgilityAppSDK()
-	const [slug, setSlug] = useState<string>("")
+	const { contentItem, field, fieldValue } = useAgilityAppSDK()
+
 	const [currentTitle, setCurrentTitle] = useState<string>("")
 
 	const regenerateSlug = async (title: string) => {
 		const newVal = makeFriendlyStr(title)
-		contentItemMethods.setFieldValue({ value: newVal })
-		setSlug(newVal)
+		contentItemMethods.setFieldValue({ name: field?.name, value: newVal })
 	}
 
 	useEffect(() => {
-		const isNewContentItem = Boolean(contentItem && contentItem?.contentID < 0)
-
-		setSlug(() => {
-			return isNewContentItem ? contentItem?.values.Title : contentItem?.values.Slug
-		})
-
+		//listen for changes to the title field
 		contentItemMethods.addFieldListener({
 			fieldName: "Title",
 			onChange: (t) => {
-				if (isNewContentItem) regenerateSlug(t)
 				setCurrentTitle(t)
+
+				contentItemMethods?.getContentItem()?.then((ci) => {
+					//only regenerate the slug if the content item is new
+					const isNewContentItem = Boolean((ci?.contentID ?? -1) < 0)
+					if (isNewContentItem) {
+						regenerateSlug(t)
+					}
+				})
 			}
 		})
-	}, [contentItem])
+	}, [])
 
 	useEffect(() => {
 		setHeight({ height: 50 })
@@ -62,12 +63,15 @@ const FriendlyURLField = () => {
 
 	return (
 		<div className="flex flex-row items-center justify-between gap-1">
-			<div className="w-full p-1">
+			<div className="w-full p-1 ">
 				<TextInputAddon
 					type="text"
-					value={slug}
+					value={fieldValue}
 					trailIcon={hasBeenSaved ? "RefreshIcon" : undefined}
 					trailLabel={hasBeenSaved ? "Re-Generate Slug" : undefined}
+					onChange={(str) => {
+						regenerateSlug(str)
+					}}
 					onCtaClick={() => {
 						openAlertModal({
 							title: "Re-Generate Slug",
@@ -78,9 +82,7 @@ const FriendlyURLField = () => {
 							iconName: "QuestionMarkCircleIcon",
 							callback: (ok: boolean) => {
 								if (!ok) return
-								const newVal = makeFriendlyStr(currentTitle)
-								contentItemMethods.setFieldValue({ value: newVal })
-								setSlug(newVal)
+								regenerateSlug(currentTitle)
 							}
 						})
 					}}
