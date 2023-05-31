@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react"
 import { contentItemMethods, useAgilityAppSDK, setHeight, getManagementAPIToken } from "@agility/app-sdk"
 import useOnScreen from "../hooks/useOnScreen"
 
-import EditorJS from "@editorjs/editorjs"
+import EditorJS, { OutputData } from "@editorjs/editorjs"
 import Embed from "@editorjs/embed"
 import Table from "@editorjs/table"
 import Paragraph from "@editorjs/paragraph"
@@ -19,7 +19,7 @@ import NestedList from "@editorjs/nested-list"
 import DragDrop from "editorjs-drag-drop"
 
 const BlockEditor = ({ configuration }: { configuration: any }) => {
-	const {  initializing, field, instance, contentItem, fieldValue } = useAgilityAppSDK()
+	const { initializing, instance, fieldValue } = useAgilityAppSDK()
 	const containerRef = useRef<HTMLIFrameElement>(null)
 	const blockRef = useRef<HTMLIFrameElement>(null)
 	const savedValue = useRef<string | null>(null)
@@ -39,7 +39,6 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 	}, [])
 
 	useEffect(() => {
-
 		//handle changes to the field value from outside the editor
 
 		if (!editor.current) return
@@ -47,15 +46,17 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 
 		const str = savedValue.current
 
-
-		if (fieldValue !== savedValue.current) {
-
+		if (fieldValue !== str) {
 			if (!fieldValue) {
 				editor.current.clear()
 			} else {
-				const blocks = JSON.parse(fieldValue)
-				if (blocks) {
-					editor.current.render(blocks)
+				try {
+					const data = JSON.parse(fieldValue) as OutputData
+					if (data && data.blocks) {
+						editor.current.render(data)
+					}
+				} catch (e) {
+					console.warn("Error parsing JSON for Block Editor", e)
 				}
 			}
 		}
@@ -63,15 +64,19 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 
 	const initEditor = () => {
 		if (fieldValue && editor.current) {
-			const blocks = JSON.parse(fieldValue)
-			if (blocks) {
-				editor.current.render(blocks)
+			try {
+				const data = JSON.parse(fieldValue) as OutputData
+				if (data && data.blocks) {
+					editor.current.render(data)
+				}
+			} catch (e) {
+				console.warn("Error parsing JSON for Block Editor", e)
 			}
 		}
 	}
 
-
 	useEffect(() => {
+		//initialize the editor
 		if (!blockRef.current || !token || initializing) return
 
 		if (editor.current) return
@@ -118,7 +123,10 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 				embed: Embed
 			},
 			onChange: (e: any) => {
-				editorJS.save().then((v: any) => {
+				editorJS.save().then((v) => {
+					//remove the time and version properties - we ONLY care about the blocks
+					delete v.time
+					delete v.version
 					const valueJSON = JSON.stringify(v)
 					if (valueJSON !== fieldValue) {
 						savedValue.current = valueJSON
@@ -127,7 +135,6 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 				})
 			},
 			onReady: () => {
-
 				const blockSizeElm = document.querySelector<HTMLElement>("#container-element")
 				if (blockSizeElm) {
 					const observer = new ResizeObserver((entries) => {
@@ -151,8 +158,8 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 	}, [blockRef, initializing, token])
 
 	return (
-		<div className="bg-white py-2 px-20" ref={containerRef} id="container-element">
-			<div className="min-h-[400px] prose" id="editor-elem" ref={blockRef}></div>
+		<div className="bg-white px-20 py-2" ref={containerRef} id="container-element">
+			<div className="prose min-h-[400px]" id="editor-elem" ref={blockRef}></div>
 		</div>
 	)
 }
