@@ -96,7 +96,7 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 			autofocus: false, //setting this to true will not do anything because this is in an iframe
 			holder: blockRef.current,
 			placeholder: "📝 Enter text, paste images/embed urls, or select a block to add here...",
-			inlineToolbar: false,
+			inlineToolbar: true,
 
 			tools: {
 				table: Table,
