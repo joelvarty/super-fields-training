@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from "react"
-import { contentItemMethods, useAgilityAppSDK, setHeight, getManagementAPIToken } from "@agility/app-sdk"
+import { contentItemMethods, useAgilityAppSDK, setHeight, getManagementAPIToken, useResizeHeight } from "@agility/app-sdk"
 import useOnScreen from "../hooks/useOnScreen"
 
-import EditorJS from "@editorjs/editorjs"
+import EditorJS, { OutputData } from "@editorjs/editorjs"
 import Embed from "@editorjs/embed"
 import Table from "@editorjs/table"
 import Paragraph from "@editorjs/paragraph"
@@ -20,10 +20,13 @@ import DragDrop from "editorjs-drag-drop"
 import { useCallback } from "react"
 
 const BlockEditor = ({ configuration }: { configuration: any }) => {
-	const {  initializing, field, instance, contentItem, fieldValue } = useAgilityAppSDK()
+	const { initializing, instance, fieldValue } = useAgilityAppSDK()
+
 	const containerRef = useRef<HTMLIFrameElement>(null)
 	const blockRef = useRef<HTMLIFrameElement>(null)
 	const savedValue = useRef<string | null>(null)
+
+	useResizeHeight({ref: containerRef})
 
 	const isVisible = useOnScreen(containerRef)
 
@@ -40,39 +43,48 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 	}, [])
 
 	useEffect(() => {
-
 		//handle changes to the field value from outside the editor
 
 		if (!editor.current) return
 		if (savedValue.current === null) return
 
-		const blocks = JSON.parse(fieldValue)
-		if (fieldValue !== savedValue.current) {
-
-			if (!fieldValue || blocks.blocks.length == 0) {
-				editor.current.clear()
-			} else {
-				if (blocks) {
-					editor.current.render(blocks)
+		try {
+			const blocks = JSON.parse(fieldValue) as OutputData
+			if (fieldValue !== savedValue.current) {
+	
+				if (!fieldValue || blocks.blocks.length == 0) {
+					editor.current.clear()
+				} else {
+					if (blocks) {
+						editor.current.render(blocks)
+					}
 				}
 			}
+		} catch (e) {
+			console.warn("Error parsing JSON for Block Editor", e)
 		}
 	}, [fieldValue, editor])
 
 	const initEditor = useCallback(() => {
 		if (fieldValue && editor.current) {
-			const blocks = JSON.parse(fieldValue)
-
-			if (blocks.blocks.length == 0) {
-				editor.current.clear()
-			} else {
-				editor.current.render(blocks)
+			try {
+				const blocks = JSON.parse(fieldValue) as OutputData
+	
+				if (blocks.blocks.length == 0) {
+					editor.current.clear()
+				} else {
+					editor.current.render(blocks)
+				}
+			} catch (e) {
+				console.warn("Error parsing JSON for Block Editor", e)
 			}
 		}
 	}, [editor.current, fieldValue])
 
 
+
 	useEffect(() => {
+		//initialize the editor
 		if (!blockRef.current || !token || initializing) return
 
 		if (editor.current) return
@@ -87,6 +99,7 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 			autofocus: false, //setting this to true will not do anything because this is in an iframe
 			holder: blockRef.current,
 			placeholder: "📝 Enter text, paste images/embed urls, or select a block to add here...",
+			inlineToolbar: true,
 
 			tools: {
 				table: Table,
@@ -116,10 +129,13 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 				marker: Marker,
 				delimiter: Delimiter,
 				inlineCode: InlineCode,
-				embed: Embed
+				embed: Embed,
 			},
 			onChange: (e: any) => {
-				editorJS.save().then((v: any) => {
+				editorJS.save().then((v) => {
+					//remove the time and version properties - we ONLY care about the blocks
+					delete v.time
+					delete v.version
 					const valueJSON = JSON.stringify(v)
 					if (valueJSON !== fieldValue) {
 						savedValue.current = valueJSON
@@ -128,19 +144,18 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 				})
 			},
 			onReady: () => {
+				// const blockSizeElm = document.querySelector<HTMLElement>("#container-element")
+				// if (blockSizeElm) {
+				// 	const observer = new ResizeObserver((entries) => {
+				// 		const entry = entries[0]
+				// 		if (!entry) return
+				// 		let height = entry.contentRect.height + 50
+				// 		if (height < 400) height = 400
 
-				const blockSizeElm = document.querySelector<HTMLElement>("#container-element")
-				if (blockSizeElm) {
-					const observer = new ResizeObserver((entries) => {
-						const entry = entries[0]
-						if (!entry) return
-						let height = entry.contentRect.height + 50
-						if (height < 400) height = 400
-
-						setHeight({ height })
-					})
-					observer.observe(blockSizeElm)
-				}
+				// 		setHeight({ height })
+				// 	})
+				// 	observer.observe(blockSizeElm)
+				// }
 
 				new DragDrop(editorJS)
 
@@ -152,8 +167,8 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 	}, [blockRef, initializing, token])
 
 	return (
-		<div className="bg-white py-2 px-20" ref={containerRef} id="container-element">
-			<div className="min-h-[400px] prose" id="editor-elem" ref={blockRef}></div>
+		<div className="bg-white" ref={containerRef} id="container-element">
+			<div className="mx-20 prose min-h-[400px] pb-14 pt-2" id="editor-elem" ref={blockRef}></div>
 		</div>
 	)
 }

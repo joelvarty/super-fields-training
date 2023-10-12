@@ -1,4 +1,4 @@
-import { useAgilityAppSDK, contentItemMethods, setHeight } from "@agility/app-sdk"
+import { useAgilityAppSDK, contentItemMethods,  useResizeHeight } from "@agility/app-sdk"
 import React, { useState, useEffect, useRef, useMemo } from "react"
 import useOnScreen from "../hooks/useOnScreen"
 import SimpleMDE from "react-simplemde-editor"
@@ -7,6 +7,8 @@ const MarkdownEditor = () => {
 	const { fieldValue } = useAgilityAppSDK()
 	const containerRef = useRef<HTMLIFrameElement | null>(null)
 	const isVisible = useOnScreen(containerRef)
+
+	useResizeHeight({ ref: containerRef })
 
 	const markdownValues = fieldValue
 
@@ -30,18 +32,8 @@ const MarkdownEditor = () => {
 		return () => observer.disconnect()
 	}, [isVisible])
 
-	// when the markdown height of the simple-mde changes, then adjust the height of iframe
-	// and offset the height by 200 so the element can scroll all the way back up
-	useEffect(() => {
-		// min height for the editor is 400
-		const height = markdownHeight < 400 ? 400 : markdownHeight + 100
-
-		setHeight({ height })
-	}, [markdownHeight])
-
-
 	return (
-		<div ref={containerRef} className="bg-white min-h-[400px]">
+		<div ref={containerRef} className="min-h-[400px] bg-white">
 			<SimpleMDE id="simple-mde" value={markdownValues} onChange={onChange} />
 		</div>
 	)
