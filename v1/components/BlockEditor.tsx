@@ -17,6 +17,7 @@ import Delimiter from "@editorjs/delimiter"
 import InlineCode from "@editorjs/inline-code"
 import NestedList from "@editorjs/nested-list"
 import DragDrop from "editorjs-drag-drop"
+import { useCallback } from "react"
 
 const BlockEditor = ({ configuration }: { configuration: any }) => {
 	const { initializing, instance, fieldValue } = useAgilityAppSDK()
@@ -47,36 +48,38 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 		if (!editor.current) return
 		if (savedValue.current === null) return
 
-		const str = savedValue.current
-
-		if (fieldValue !== str) {
-			if (!fieldValue) {
-				editor.current.clear()
-			} else {
-				try {
-					const data = JSON.parse(fieldValue) as OutputData
-					if (data && data.blocks) {
-						editor.current.render(data)
+		try {
+			const blocks = JSON.parse(fieldValue) as OutputData
+			if (fieldValue !== savedValue.current) {
+	
+				if (!fieldValue || blocks.blocks.length == 0) {
+					editor.current.clear()
+				} else {
+					if (blocks) {
+						editor.current.render(blocks)
 					}
-				} catch (e) {
-					console.warn("Error parsing JSON for Block Editor", e)
 				}
 			}
+		} catch (e) {
+			console.warn("Error parsing JSON for Block Editor", e)
 		}
 	}, [fieldValue, editor])
 
-	const initEditor = () => {
+	const initEditor = useCallback(() => {
 		if (fieldValue && editor.current) {
 			try {
-				const data = JSON.parse(fieldValue) as OutputData
-				if (data && data.blocks) {
-					editor.current.render(data)
+				const blocks = JSON.parse(fieldValue) as OutputData
+	
+				if (blocks.blocks.length == 0) {
+					editor.current.clear()
+				} else {
+					editor.current.render(blocks)
 				}
 			} catch (e) {
 				console.warn("Error parsing JSON for Block Editor", e)
 			}
 		}
-	}
+	}, [editor.current, fieldValue])
 
 
 
