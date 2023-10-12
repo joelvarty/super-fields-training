@@ -17,6 +17,7 @@ import Delimiter from "@editorjs/delimiter"
 import InlineCode from "@editorjs/inline-code"
 import NestedList from "@editorjs/nested-list"
 import DragDrop from "editorjs-drag-drop"
+import { useCallback } from "react"
 
 const BlockEditor = ({ configuration }: { configuration: any }) => {
 	const {  initializing, field, instance, contentItem, fieldValue } = useAgilityAppSDK()
@@ -45,15 +46,12 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 		if (!editor.current) return
 		if (savedValue.current === null) return
 
-		const str = savedValue.current
-
-
+		const blocks = JSON.parse(fieldValue)
 		if (fieldValue !== savedValue.current) {
 
-			if (!fieldValue) {
+			if (!fieldValue || blocks.blocks.length == 0) {
 				editor.current.clear()
 			} else {
-				const blocks = JSON.parse(fieldValue)
 				if (blocks) {
 					editor.current.render(blocks)
 				}
@@ -61,14 +59,17 @@ const BlockEditor = ({ configuration }: { configuration: any }) => {
 		}
 	}, [fieldValue, editor])
 
-	const initEditor = () => {
+	const initEditor = useCallback(() => {
 		if (fieldValue && editor.current) {
 			const blocks = JSON.parse(fieldValue)
-			if (blocks) {
+
+			if (blocks.blocks.length == 0) {
+				editor.current.clear()
+			} else {
 				editor.current.render(blocks)
 			}
 		}
-	}
+	}, [editor.current, fieldValue])
 
 
 	useEffect(() => {
