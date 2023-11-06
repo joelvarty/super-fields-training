@@ -1,31 +1,13 @@
 {
-	"name": "Power Fields",
+	"name": "Super Fields",
 	"documentationLink": "https://agilitycms.com/docs/apps/power-fields",
-	"description": "Power Fields App - containing multiple different custom fields. Markdown Editor, Block Editor and Friendly URL slug Generator",
+	"description": "Super Fields App - containing multiple different custom fields. Markdown Editor, Block Editor and Friendly URL slug Generator",
 	"__sdkVersion": "2.0.0",
-	"configValuesBAK": [
-		{
-			"name": "assetFolder",
-			"label": "Asset Upload Folder Path (i.e. 'images/block-editor')",
-			"type": "string",
-			"description": "Config value needed for the block editor"
-		}
-	],
 	"capabilities": {
 		"fields": [
 			{
-				"label": "Block Editor",
-      		"name": "BlockEditorJSON",
-				"description": "A block editor that can replace the rich text editor field."
-			},
-			{
-				"label": "Markdown Editor",
-				"name": "Markdown",
-				"description": "A markdown editor."
-			},
-			{
-				"label": "Friendly URL",
-				"name": "FriendlyURL",
+				"label": "Slug",
+				"name": "Slug",
 				"description": "A slug field for friendly URLs."
 			}
 		]

@@ -1,7 +1,7 @@
-import { useAgilityAppSDK, contentItemMethods, setHeight, openAlertModal } from "@agility/app-sdk"
+import { useAgilityAppSDK, contentItemMethods, setHeight, openAlertModal, useResizeHeight } from "@agility/app-sdk"
 import { TextInput, Button, TextInputAddon } from "@agility/plenum-ui"
 import { IconName } from "@agility/plenum-ui/lib/util/DynamicIcons"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 const makeFriendlyStr = (s: string): string => {
 	if (!s) return ""
@@ -55,16 +55,21 @@ const FriendlyURLField = () => {
 		})
 	}, [])
 
-	useEffect(() => {
-		setHeight({ height: 50 })
-	}, [])
+	const containerRef = useRef<HTMLDivElement>(null)
+	useResizeHeight({ ref: containerRef })
 
 	const hasBeenSaved = !!!(contentItem && contentItem?.contentID < 0)
 
 	return (
-		<div className="flex flex-row items-center justify-between gap-1">
+		<div className="flex flex-row items-center justify-between gap-1" ref={containerRef}>
 			<div className="w-full p-1 ">
-				<TextInputAddon
+				<textarea
+					value={fieldValue}
+					onChange={(e) => {
+						contentItemMethods.setFieldValue({ name: field?.name, value: e.target.value })
+					}}
+				/>
+				{/* <TextInputAddon
 					type="text"
 					value={fieldValue}
 					trailIcon={hasBeenSaved ? "RefreshIcon" : undefined}
@@ -75,6 +80,7 @@ const FriendlyURLField = () => {
 					onCtaClick={() => {
 						openAlertModal({
 							title: "Re-Generate Slug",
+							iconColor: "blue",
 							message:
 								"By changing the URL you could create broken links. We recommend you add in a URL redirection from the old URL to the new URL. Are you sure you wish to continue?",
 							okButtonText: "Re-Generate",
@@ -86,7 +92,7 @@ const FriendlyURLField = () => {
 							}
 						})
 					}}
-				/>
+				/> */}
 			</div>
 		</div>
 	)
